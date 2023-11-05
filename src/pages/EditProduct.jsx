@@ -280,9 +280,9 @@ const EditProduct = () => {
     }
 
     console.log(location.state.data);
-    formRef.current?.setFieldsValue(() => ({
-      itemUid: location.state.data.itemUid,
-    }));
+    formRef.current?.setFieldsValue({
+      ...location.state.data,
+    });
   }, [location]);
 
   useEffect(() => {
