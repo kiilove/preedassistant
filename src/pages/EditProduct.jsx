@@ -29,8 +29,10 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import useImageUpload from "../hooks/useFireStorage";
 import { useFirestoreAddData } from "../hooks/useFirestore";
+import { useLocation, useParams } from "react-router-dom";
 
-const NewProduct = () => {
+const EditProduct = () => {
+  const location = useLocation(null);
   const formRef = useRef();
   const productModalRef = useRef();
   const productPicRef = useRef();
@@ -44,8 +46,9 @@ const NewProduct = () => {
   } = useImageUpload("/productPic/");
 
   const [newItemInfo, setNewItemInfo] = useState({ itemIsActive: true });
-  const [newProductOpen, setNewProductOpen] = useState(false);
+  const [currentItemInfo, setCurrentItemInfo] = useState({});
   const [productList, setProductList] = useState([]);
+  const [newProductOpen, setNewProductOpen] = useState(false);
   const [newProductInfo, setNewProductInfo] = useState({});
 
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -85,15 +88,13 @@ const NewProduct = () => {
   };
 
   const onFinish = async (values) => {
-    console.log(values);
     const newValue = { ...values, productList: [...productList] };
-    console.log(newValue);
-    setNewItemInfo(() => ({ ...newValue }));
+
+    setCurrentItemInfo(() => ({ ...newValue }));
 
     await firestoreAdd.addData("products", { ...newValue }, (data) => {
       console.log(data);
     });
-    console.log(newItemInfo);
   };
   const onProductFinish = async () => {
     setNewProductInfo(() => ({
@@ -250,12 +251,6 @@ const NewProduct = () => {
         label="상품설명"
         style={{ height: "auto", minHeight: "250px" }}
       >
-        {/* <TextArea
-          autoSize={{
-            minRows: 4,
-            maxRows: 10,
-          }}
-        /> */}
         <div className="flex">
           <ReactQuill
             style={{
@@ -269,25 +264,10 @@ const NewProduct = () => {
           />
         </div>
       </Form.Item>
-      {/* <div
-        dangerouslySetInnerHTML={{
-          __html: DOMPurify.sanitize(
-            productModalRef.current?.getFieldsValue().productInfomation
-          ),
-        }}
-      /> */}
-      {/* <div className="flex border rounded-lg border-gray-400 p-2  ">
-        <ReactQuill value={quillValue || ""} readOnly theme="bubble" />
-      </div> */}
     </Form>
   );
 
   useEffect(() => {
-    formRef.current?.setFieldsValue({ itemUid: generateUUID() });
-  }, []);
-
-  useEffect(() => {
-    console.log(newProductInfo);
     if (!newProductInfo?.productUid) {
       return;
     }
@@ -295,12 +275,19 @@ const NewProduct = () => {
   }, [newProductInfo]);
 
   useEffect(() => {
-    console.log(fileList);
-  }, [fileList]);
+    if (!location.state) {
+      return;
+    }
+
+    console.log(location.state.data);
+    formRef.current?.setFieldsValue(() => ({
+      itemUid: location.state.data.itemUid,
+    }));
+  }, [location]);
 
   useEffect(() => {
-    console.log(productList);
-  }, [productList]);
+    console.log(formRef.current?.getFieldsValue());
+  }, [formRef.current]);
 
   return (
     <div className="flex w-full h-full bg-white rounded-lg p-5">
@@ -385,4 +372,4 @@ const NewProduct = () => {
   );
 };
 
-export default NewProduct;
+export default EditProduct;

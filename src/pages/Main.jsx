@@ -39,9 +39,9 @@ const Main = ({ children }) => {
             {
               key: "2",
               icon: <VideoCameraOutlined />,
-              label: "테스트",
+              label: "제품목록",
               onClick: () => {
-                navigate("/test");
+                navigate("/productlist");
               },
             },
             {

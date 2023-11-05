@@ -7,6 +7,9 @@ import {
   deleteDoc,
   updateDoc,
   getDoc,
+  query,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -17,11 +20,11 @@ export function useFirestoreQuery() {
 
   async function getDocuments(
     collectionName,
+    callback = null,
     conditions = [],
     orderByField = "",
     orderByDirection = "asc",
-    limitNumber = 0,
-    callback = null
+    limitNumber = 0
   ) {
     let q = collection(db, collectionName);
     conditions.forEach((condition) => {
@@ -95,6 +98,7 @@ export function useFirestoreAddData() {
       setLoading(true);
       const docRef = await addDoc(collection(db, collectionName), newData);
       const addedData = { ...newData, id: docRef.id };
+
       setData(addedData);
       if (callback) callback(addedData);
     } catch (error) {
