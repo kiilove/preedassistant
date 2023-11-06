@@ -159,13 +159,30 @@ const NewProduct = () => {
             return (
               <Card
                 className="w-full"
-                cover={<img src={productPic[0].url} className="p-2" />}
-                style={{ maxWidth: "250px" }}
+                cover={
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center", // 수평 가운데 정렬
+                      alignItems: "center", // 수직 가운데 정렬
+                    }}
+                  >
+                    <img
+                      src={productPic[0].url}
+                      className="p-2"
+                      style={{
+                        maxWidth: "100px",
+                      }}
+                    />
+                  </div>
+                }
+                style={{
+                  maxWidth: "250px",
+                }}
               >
                 <div className="flex flex-col">
-                  <span className="flex text-lg font-semibold text-gray-600">
-                    {makerName}
-                    {productName}
+                  <span className="flex text-sm font-semibold text-gray-600">
+                    {makerName} {productName}
                   </span>
                   <div className="flex">
                     <ReactQuill

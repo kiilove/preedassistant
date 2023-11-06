@@ -5,10 +5,12 @@ import {
   Form,
   Input,
   Modal,
+  Popconfirm,
   Select,
   Space,
   Switch,
   Upload,
+  notification,
   theme,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -16,7 +18,11 @@ import React, { useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
-import DOMPurify from "dompurify";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
 import { useEffect } from "react";
 import { generateFileName, generateUUID } from "../functions";
 import {
@@ -28,14 +34,16 @@ import {
 } from "../consts";
 import TextArea from "antd/es/input/TextArea";
 import useImageUpload from "../hooks/useFireStorage";
-import { useFirestoreAddData } from "../hooks/useFirestore";
+import {
+  useFirestoreAddData,
+  useFirestoreUpdateData,
+} from "../hooks/useFirestore";
 import { useLocation, useParams } from "react-router-dom";
 
 const EditProduct = () => {
   const location = useLocation(null);
-  const formRef = useRef();
-  const productModalRef = useRef();
-  const productPicRef = useRef();
+  const formRef = useRef(null);
+  const productModalRef = useRef(null);
   const [form] = Form.useForm();
   const {
     uploadImage,
@@ -45,11 +53,23 @@ const EditProduct = () => {
     downloadUrl,
   } = useImageUpload("/productPic/");
 
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (apiType, title, message, placement, duration) => {
+    api[apiType]({
+      message: title,
+      description: message,
+      placement,
+      duration,
+    });
+  };
+
   const [newItemInfo, setNewItemInfo] = useState({ itemIsActive: true });
   const [currentItemInfo, setCurrentItemInfo] = useState({});
   const [productList, setProductList] = useState([]);
   const [newProductOpen, setNewProductOpen] = useState(false);
+  const [editProductOpen, setEditProductOpen] = useState(false);
   const [newProductInfo, setNewProductInfo] = useState({});
+  const [currentProductInfo, setCurrentProductInfo] = useState({});
 
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
@@ -57,6 +77,7 @@ const EditProduct = () => {
   const [fileList, setFileList] = useState([]);
   const [quillValue, setQuillValue] = useState("");
   const firestoreAdd = useFirestoreAddData();
+  const firestoreUpdate = useFirestoreUpdateData();
 
   const handleQuillChange = (content, delta, source, editor) => {
     setQuillValue(editor.getContents());
@@ -74,6 +95,43 @@ const EditProduct = () => {
     setFileList([]);
     setNewProductOpen(false);
   };
+
+  const handleDeleteConfirm = (propIndex) => {
+    const newProductList = [...productList];
+    newProductList.splice(propIndex, 1);
+    setProductList([...newProductList]);
+    console.log(newProductList);
+    openNotification(
+      "info",
+      "상품삭제",
+      "해당상품이 삭제되었습니다.",
+      "bottomLeft",
+      2
+    );
+  };
+  const handleDeleteCancel = () => {
+    return;
+  };
+
+  const handleEditProductOpen = (propIndex) => {
+    // 선택한 상품 id값을 찾아와야함
+    if (propIndex === undefined || propIndex === -1) {
+      openNotification("error", "오류", "상품일련번호 불러오기 실패", "top", 2);
+      return;
+    } else {
+      const productInfo = { ...productList[propIndex] };
+      setCurrentProductInfo(() => ({ ...productInfo }));
+
+      setFileList([...productInfo.productPic]);
+      setQuillValue(JSON.parse(productInfo.productInfomation));
+
+      setEditProductOpen(true);
+    }
+  };
+  const handleEditProductClose = () => {
+    setFileList([]);
+    setEditProductOpen(false);
+  };
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
     console.log(file);
@@ -89,12 +147,37 @@ const EditProduct = () => {
 
   const onFinish = async (values) => {
     const newValue = { ...values, productList: [...productList] };
-
+    const docuId = location.state.data.id;
     setCurrentItemInfo(() => ({ ...newValue }));
 
-    await firestoreAdd.addData("products", { ...newValue }, (data) => {
-      console.log(data);
-    });
+    if (!docuId && docuId === "") {
+      openNotification(
+        "error",
+        "업데이트오류",
+        "문서ID를 받아오지 못했습니다.",
+        "bottomLeft",
+        2
+      );
+    } else {
+      try {
+        await firestoreUpdate.updateData(
+          "products",
+          docuId,
+          { ...newValue },
+          () => {
+            openNotification(
+              "success",
+              "업데이트",
+              "업데이트를 완료했습니다.",
+              "top",
+              2
+            );
+          }
+        );
+      } catch (error) {
+        openNotification("error", "topLeft", error.message);
+      }
+    }
   };
   const onProductFinish = async () => {
     setNewProductInfo(() => ({
@@ -104,6 +187,10 @@ const EditProduct = () => {
       productPic: fileList,
     }));
     handleNewProductClose();
+  };
+
+  const onProductEditFinish = async () => {
+    openNotification("info", "Todo", "수정버튼 만들어야해");
   };
 
   const reduceProductList = (data) => {
@@ -160,13 +247,49 @@ const EditProduct = () => {
             return (
               <Card
                 className="w-full"
-                cover={<img src={productPic[0].url} className="p-2" />}
-                style={{ maxWidth: "250px" }}
+                cover={
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center", // 수평 가운데 정렬
+                      alignItems: "center", // 수직 가운데 정렬
+                    }}
+                  >
+                    <img
+                      src={productPic[0].url}
+                      className="p-2"
+                      style={{
+                        maxWidth: "100px",
+                      }}
+                    />
+                  </div>
+                }
+                style={{
+                  maxWidth: "250px",
+                }}
+                actions={[
+                  <EditOutlined
+                    style={{ fontSize: "20px" }}
+                    onClick={() => handleEditProductOpen(pIdx)}
+                  />,
+                  <Popconfirm
+                    title="삭제"
+                    description="해당 상품을 삭제하시겠습니까?"
+                    onConfirm={() => handleDeleteConfirm(pIdx)}
+                    onCancel={handleDeleteCancel}
+                    okButtonProps={{
+                      style: { backgroundColor: "red", width: "60px" },
+                    }}
+                    okText="예"
+                    cancelText="아니오"
+                  >
+                    <DeleteOutlined style={{ fontSize: "20px" }} />
+                  </Popconfirm>,
+                ]}
               >
-                <div className="flex flex-col">
-                  <span className="flex text-lg font-semibold text-gray-600">
-                    {makerName}
-                    {productName}
+                <div className="flex flex-col" style={{ minHeight: "150px" }}>
+                  <span className="flex text-sm font-semibold text-gray-600">
+                    {makerName} {productName}
                   </span>
                   <div className="flex">
                     <ReactQuill
@@ -267,6 +390,57 @@ const EditProduct = () => {
     </Form>
   );
 
+  // const currentProductModalForm = (
+  //   <Form
+  //     labelCol={{
+  //       span: 6,
+  //     }}
+  //     wrapperCol={{
+  //       span: 16,
+  //     }}
+  //     ref={currentProductModalRef}
+  //   >
+  //     <Form.Item name="productPic" label="제품사진" required>
+  //       <Upload
+  //         listType="picture-card"
+  //         fileList={fileList}
+  //         onPreview={handlePreview}
+  //         onRemove={handelFileRemove}
+  //         customRequest={customRequest}
+  //       >
+  //         {fileList.length >= 8 ? null : uploadButton}
+  //       </Upload>
+  //     </Form.Item>
+  //     <Form.Item name="productName" label="상품명">
+  //       <Input />
+  //     </Form.Item>
+  //     <Form.Item name="productType" label="상품종류">
+  //       <Select allowClear options={[...productTypes]} />
+  //     </Form.Item>
+  //     <Form.Item name="makerName" label="제조사">
+  //       <Select allowClear options={[...makerNames]} />
+  //     </Form.Item>
+  //     <Form.Item
+  //       name="productInfomation"
+  //       label="상품설명"
+  //       style={{ height: "auto", minHeight: "250px" }}
+  //     >
+  //       <div className="flex">
+  //         <ReactQuill
+  //           style={{
+  //             height: "160px",
+  //           }}
+  //           theme="snow"
+  //           modules={quillModules}
+  //           formats={quillFormats}
+  //           value={quillValue || ""}
+  //           onChange={handleQuillChange}
+  //         />
+  //       </div>
+  //     </Form.Item>
+  //   </Form>
+  // );
+
   useEffect(() => {
     if (!newProductInfo?.productUid) {
       return;
@@ -279,19 +453,23 @@ const EditProduct = () => {
       return;
     }
 
-    console.log(location.state.data);
     formRef.current?.setFieldsValue({
       ...location.state.data,
     });
+    setProductList([...location.state.data.productList]);
   }, [location]);
 
   useEffect(() => {
-    console.log(formRef.current?.getFieldsValue());
-  }, [formRef.current]);
+    if (!currentProductInfo) {
+      return;
+    }
+
+    productModalRef.current?.setFieldsValue({ ...currentProductInfo });
+  }, [currentProductInfo]);
 
   return (
     <div className="flex w-full h-full bg-white rounded-lg p-5">
-      <Card title="상품등록" style={{ minWidth: "600px" }}>
+      <Card title="상품수정" style={{ minWidth: "600px" }}>
         <Form
           onFinish={onFinish}
           form={form}
@@ -354,6 +532,19 @@ const EditProduct = () => {
           {productModalForm}
         </Modal>
         <Modal
+          title="제품정보수정"
+          maskClosable={false}
+          centered
+          open={editProductOpen}
+          onCancel={handleEditProductClose}
+          onOk={onProductEditFinish}
+          okText="수정"
+          cancelText="취소"
+          okButtonProps={{ style: { backgroundColor: "rgb(37,99,235)" } }}
+        >
+          {productModalForm}
+        </Modal>
+        <Modal
           open={previewOpen}
           title={previewTitle}
           footer={null}
@@ -368,6 +559,7 @@ const EditProduct = () => {
           />
         </Modal>
       </Card>
+      {contextHolder}
     </div>
   );
 };
