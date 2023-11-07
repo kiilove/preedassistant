@@ -197,9 +197,7 @@ const EditProduct = () => {
     if (!data?.productPic || !data?.productName) {
       return;
     }
-
-    setProductList(() => [...productList, { ...data }]);
-    setNewProductInfo({});
+    console.log(data);
   };
 
   const getBase64 = (file) =>
