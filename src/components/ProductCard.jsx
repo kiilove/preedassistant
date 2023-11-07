@@ -26,7 +26,7 @@ const ProductCard = ({ data }) => {
     );
     spec = (
       <div className="flex justify-start items-start flex-col h-full w-full">
-        <span>[{data.productList[0].productType}]</span>
+        <span className="px-4">[{data.productList[0].productType}]</span>
         <ReactQuill
           readOnly
           theme="bubble"
@@ -65,7 +65,7 @@ const ProductCard = ({ data }) => {
       </div>
     );
     spec = (
-      <div className="flex w-auto h-28 justify-center items-center">
+      <div className="flex w-full h-28 justify-center items-center">
         {data?.productList?.map((product, pIdx) => {
           const { productInfomation, productType, productUid } = product;
           const quillValue = JSON.parse(productInfomation);
@@ -73,9 +73,9 @@ const ProductCard = ({ data }) => {
           return (
             <div
               key={pIdx}
-              className="flex justify-start items-start flex-col h-full w-1/2 gap-2"
+              className="flex justify-start items-start flex-col h-full w-full gap-2 "
             >
-              <span>[{productType}]</span>
+              <span className="px-4 ">[{productType}]</span>
               <ReactQuill
                 readOnly
                 theme="bubble"
@@ -98,7 +98,9 @@ const ProductCard = ({ data }) => {
     <Tooltip title={data.itemName}>
       <Card
         style={{ maxWidth: 400, width: "100%" }}
-        title={data.itemName}
+        title={
+          <div className="flex w-full justify-center">{data.accountCount}</div>
+        }
         size="small"
         actions={[
           <EditOutlined
@@ -115,11 +117,11 @@ const ProductCard = ({ data }) => {
           >
             {thumbnail}
           </div>
-          <div className="flex" style={{ height: "140px" }}>
-            {spec}
+          <div className="flex w-full bg-gray-300 h-8 justify-center items-center font-bold text-base border-y border-gray-500">
+            {data.itemName}
           </div>
-          <div className="flex w-full bg-red-200 h-8 justify-center items-center font-bold text-base border-y-2 border-red-500">
-            {data.accountCount}
+          <div className="flex w-full" style={{ height: "140px" }}>
+            {spec}
           </div>
         </div>
       </Card>

@@ -24,7 +24,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import { useEffect } from "react";
-import { generateFileName, generateUUID } from "../functions";
+import { generateFileName, generateUUID, handleArrayEdit } from "../functions";
 import {
   accountCounts,
   makerNames,
@@ -38,10 +38,12 @@ import {
   useFirestoreAddData,
   useFirestoreUpdateData,
 } from "../hooks/useFirestore";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import ProductList from "./ProductList";
 
 const EditProduct = () => {
   const location = useLocation(null);
+  const navigate = useNavigate();
   const formRef = useRef(null);
   const productModalRef = useRef(null);
   const [form] = Form.useForm();
@@ -63,7 +65,7 @@ const EditProduct = () => {
     });
   };
 
-  const [newItemInfo, setNewItemInfo] = useState({ itemIsActive: true });
+  const [newItemInfo, setNewItemInfo] = useState();
   const [currentItemInfo, setCurrentItemInfo] = useState({});
   const [productList, setProductList] = useState([]);
   const [newProductOpen, setNewProductOpen] = useState(false);
@@ -134,7 +136,6 @@ const EditProduct = () => {
   };
   const handleCancel = () => setPreviewOpen(false);
   const handlePreview = async (file) => {
-    console.log(file);
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
@@ -190,14 +191,31 @@ const EditProduct = () => {
   };
 
   const onProductEditFinish = async () => {
-    openNotification("info", "Todo", "수정버튼 만들어야해");
+    console.log(currentProductInfo);
+    console.log(productList);
+    const editProductInfo = {
+      ...productModalRef.current?.getFieldsValue(),
+      productInfomation: JSON.stringify(quillValue),
+      productPic: fileList,
+    };
+
+    const newProductList = handleArrayEdit(
+      productList,
+      editProductInfo,
+      "productUid",
+      currentProductInfo?.productUid
+    );
+    console.log(newProductList);
+    setProductList(() => [...newProductList]);
   };
 
-  const reduceProductList = (data) => {
+  const reduceAddProductList = (data) => {
     if (!data?.productPic || !data?.productName) {
       return;
     }
-    console.log(data);
+
+    setProductList(() => [...productList, { ...data }]);
+    setNewProductInfo({});
   };
 
   const getBase64 = (file) =>
@@ -443,14 +461,14 @@ const EditProduct = () => {
     if (!newProductInfo?.productUid) {
       return;
     }
-    reduceProductList(newProductInfo);
+    reduceAddProductList(newProductInfo);
   }, [newProductInfo]);
 
   useEffect(() => {
     if (!location.state) {
       return;
     }
-
+    console.log(location.state.data);
     formRef.current?.setFieldsValue({
       ...location.state.data,
     });
@@ -464,6 +482,10 @@ const EditProduct = () => {
 
     productModalRef.current?.setFieldsValue({ ...currentProductInfo });
   }, [currentProductInfo]);
+
+  useEffect(() => {
+    console.log(productList);
+  }, [productList]);
 
   return (
     <div className="flex w-full h-full bg-white rounded-lg p-5">
@@ -483,7 +505,7 @@ const EditProduct = () => {
             <Input disabled />
           </Form.Item>
           <Form.Item name="itemIsActive" label="판매여부">
-            <Switch defaultChecked />
+            <Switch checked={location?.state?.data?.itemIsActive} />
           </Form.Item>
           <Form.Item
             name="itemName"

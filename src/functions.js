@@ -46,3 +46,13 @@ export function getRandomNumber(min, max) {
   // min과 max 사이의 임의의 소수를 얻고, 그 소수를 min과 max 사이의 범위로 변환합니다.
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export const handleArrayEdit = (originalArray, newValue, keyName, keyValue) => {
+  const newArray = [...originalArray];
+  const arrayIndex = newArray.findIndex((f) => f[keyName] === keyValue);
+
+  if (arrayIndex != -1) {
+    newArray.splice(arrayIndex, 1, newValue);
+  }
+  return newArray;
+};
