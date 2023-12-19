@@ -98,7 +98,8 @@ const useImageUpload = (path) => {
         setUploadResult({ success: true, downloadUrl: url, filename });
         resolve({ success: true, downloadUrl: url, filename });
       } catch (error) {
-        setUploadResult({ success: false, error });
+        setUploadResult({ success: false, error: error.code });
+        console.log(error.code);
         reject({ success: false, error });
       }
     });
