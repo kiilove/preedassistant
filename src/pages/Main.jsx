@@ -47,7 +47,10 @@ const Main = ({ children }) => {
             {
               key: "3",
               icon: <UploadOutlined />,
-              label: "nav 3",
+              label: "상품등록",
+              onClick: () => {
+                navigate("/productpost");
+              },
             },
           ]}
         ></Menu>

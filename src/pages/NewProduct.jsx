@@ -86,7 +86,11 @@ const NewProduct = () => {
 
   const onFinish = async (values) => {
     console.log(values);
-    const newValue = { ...values, productList: [...productList] };
+    const newValue = {
+      ...values,
+      productList: [...productList],
+      itemIsActive: true,
+    };
     console.log(newValue);
     setNewItemInfo(() => ({ ...newValue }));
 
@@ -318,6 +322,10 @@ const NewProduct = () => {
   useEffect(() => {
     console.log(productList);
   }, [productList]);
+
+  useEffect(() => {
+    console.log(quillValue);
+  }, [quillValue]);
 
   return (
     <div className="flex w-full h-full bg-white rounded-lg p-5">

@@ -4,6 +4,7 @@ import Main from "./pages/Main";
 import NewProduct from "./pages/NewProduct";
 import ProductList from "./pages/ProductList";
 import EditProduct from "./pages/EditProduct";
+import PostByQuill from "./components/PostByQuill";
 
 function App() {
   return (
@@ -21,6 +22,10 @@ function App() {
         <Route
           path="/productlist"
           element={<Main children={<ProductList />} />}
+        />
+        <Route
+          path="/productpost"
+          element={<Main children={<PostByQuill />} />}
         />
         {/* <Route path="/test" element={<Main children={<AntdTest />} />} />
         <Route
