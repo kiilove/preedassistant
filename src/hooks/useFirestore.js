@@ -94,7 +94,6 @@ export function useFirestoreAddData() {
   const [error, setError] = useState(null);
 
   async function addData(collectionName, newData, callback = null) {
-    console.log(newData);
     try {
       setLoading(true);
       const docRef = await addDoc(collection(db, collectionName), newData);
@@ -103,7 +102,6 @@ export function useFirestoreAddData() {
       setData(addedData);
       if (callback) callback(addedData);
     } catch (error) {
-      console.log(error);
       setError(error);
     } finally {
       setLoading(false);

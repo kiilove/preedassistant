@@ -17,6 +17,17 @@ export const productTypes = [
   { value: "돌쇼파", label: "돌쇼파" },
 ];
 
+export const vendorList = [
+  { value: "보람상조", label: "보람상조" },
+  { value: "프리드라이프", label: "프리드라이프" },
+];
+
+export const sangjoList = [
+  { value: "기본형", label: "기본형", refVendor: "보람상조" },
+  { value: "고급형", label: "고급형", refVendor: "보람상조" },
+  { value: "늘행복", label: "늘행복", refVendor: "프리드라이프" },
+];
+
 export const makerNames = [
   { value: "LG", label: "LG" },
   { value: "삼성", label: "삼성" },

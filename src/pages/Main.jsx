@@ -4,8 +4,16 @@ import {
   MenuUnfoldOutlined,
   UploadOutlined,
   UserOutlined,
+  AppstoreAddOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
+import { CiViewList } from "react-icons/ci";
+import {
+  MdAddBusiness,
+  MdOutlineAddToQueue,
+  MdOutlineFormatListBulleted,
+  MdListAlt,
+} from "react-icons/md";
 import Sider from "antd/es/layout/Sider";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,30 +34,39 @@ const Main = ({ children }) => {
           theme="dark"
           mode="inline"
           className="text-base font-semibold "
-          defaultSelectedKeys={["1"]}
           items={[
             {
               key: "1",
-              icon: <UserOutlined />,
-              label: "제품등록",
+              icon: <MdAddBusiness style={{ fontSize: "20px" }} />,
+              label: "상품등록",
               onClick: () => {
-                navigate("/newproduct");
+                navigate("/newitem");
               },
             },
             {
               key: "2",
-              icon: <VideoCameraOutlined />,
-              label: "제품목록",
+              icon: (
+                <MdOutlineFormatListBulleted style={{ fontSize: "20px" }} />
+              ),
+              label: "상품목록",
               onClick: () => {
                 navigate("/productlist");
               },
             },
             {
               key: "3",
-              icon: <UploadOutlined />,
-              label: "상품등록",
+              icon: <MdOutlineAddToQueue style={{ fontSize: "20px" }} />,
+              label: "가전제품등록",
               onClick: () => {
-                navigate("/productpost");
+                navigate("/newelectronicproduct");
+              },
+            },
+            {
+              key: "4",
+              icon: <MdListAlt style={{ fontSize: "20px" }} />,
+              label: "가전제품목록",
+              onClick: () => {
+                navigate("/electroniclist");
               },
             },
           ]}

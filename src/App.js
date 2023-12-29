@@ -1,20 +1,28 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import Main from "./pages/Main";
-import NewProduct from "./pages/NewProduct";
+import NewProduct from "./pages/NewElectronicProduct";
 import ProductList from "./pages/ProductList";
 import EditProduct from "./pages/EditProduct";
 import PostByQuill from "./components/PostByQuill";
+import NewItem from "./pages/NewItem";
+import NewElectronicProduct from "./pages/NewElectronicProduct";
+import ElectronicList from "./pages/ElectronicList";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Main />} />
+        <Route path="/newitem" element={<Main children={<NewItem />} />} />
         <Route
-          path="/newproduct"
-          element={<Main children={<NewProduct />} />}
-        />{" "}
+          path="/newelectronicproduct"
+          element={<Main children={<NewElectronicProduct />} />}
+        />
+        <Route
+          path="/electroniclist"
+          element={<Main children={<ElectronicList />} />}
+        />
         <Route
           path="/editproduct"
           element={<Main children={<EditProduct />} />}

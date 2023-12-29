@@ -27,7 +27,7 @@ import {
   quillModules,
 } from "../consts";
 import TextArea from "antd/es/input/TextArea";
-import useImageUpload from "../hooks/useFireStorage";
+import useImageUpload from "../hooks copy/useFireStorage";
 import { useFirestoreAddData } from "../hooks/useFirestore";
 
 const NewProduct = () => {

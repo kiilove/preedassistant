@@ -4,7 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import "react-quill/dist/quill.bubble.css";
 import { quillFormats, quillModules } from "../consts";
 import LoadingGif from "../assets/img/loading.gif";
-import useImageUpload from "../hooks/useFireStorage";
+import useImageUpload from "../hooks copy/useFireStorage";
 import { generateFileName, generateUUID } from "../functions";
 
 const PostByQuill = () => {
