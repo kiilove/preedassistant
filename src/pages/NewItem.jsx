@@ -11,11 +11,15 @@ import {
 } from "../consts";
 import { generateUUID } from "../functions";
 import ProductFinder from "../components/ProductFinder";
+import { useFirestoreAddData } from "../hooks/useFirestore";
 
 const NewItem = () => {
   const [itemUnion, setItemUnion] = useState(false);
   const [filteredSangjo, setFilteredSangjo] = useState([]);
+  const [productList, setProductList] = useState([]);
+
   const itemRef = useRef();
+  const itemAdd = useFirestoreAddData();
 
   const initItemForm = (ref) => {
     ref?.current.resetFields();
@@ -25,6 +29,8 @@ const NewItem = () => {
       itemIsUnion: false,
     });
     setItemUnion(false);
+
+    setProductList([]);
   };
 
   const handleItemUnion = (value) => {
@@ -42,8 +48,20 @@ const NewItem = () => {
     }
   };
 
-  const itemFinished = (value) => {
-    console.log(value);
+  const itemFinished = async (value) => {
+    let newValue = { ...value };
+
+    if (productList?.length > 0) {
+      newValue = { ...newValue, productList };
+    }
+
+    try {
+      await itemAdd.addData("sangjos", { ...newValue }, (data) => {
+        initItemForm(itemRef);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -105,7 +123,7 @@ const NewItem = () => {
             <Switch onChange={handleItemUnion} />
           </Form.Item>
           <div className={itemUnion ? "flex pb-5" : "hidden"}>
-            <ProductFinder />
+            {ProductFinder(productList, setProductList)}
           </div>
           <div className="flex gap-x-2">
             <Button htmlType="submit">상품등록</Button>
