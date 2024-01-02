@@ -50,7 +50,7 @@ const Main = ({ children }) => {
               ),
               label: "상품목록",
               onClick: () => {
-                navigate("/productlist");
+                navigate("/itemlist");
               },
             },
             {

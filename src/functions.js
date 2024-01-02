@@ -1,6 +1,15 @@
 import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
 
+export const groupByKey = (list, key) => {
+  return list.reduce((acc, item) => {
+    if (!acc.some((accItem) => accItem.value === item[key])) {
+      acc.push({ value: item[key], label: item[key] });
+    }
+    return acc;
+  }, []);
+};
+
 export const generateUUID = () => {
   const uuid = uuidv4();
   return uuid;

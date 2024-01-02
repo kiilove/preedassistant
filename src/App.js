@@ -8,6 +8,7 @@ import PostByQuill from "./components/PostByQuill";
 import NewItem from "./pages/NewItem";
 import NewElectronicProduct from "./pages/NewElectronicProduct";
 import ElectronicList from "./pages/ElectronicList";
+import ItemList from "./pages/ItemList";
 
 function App() {
   return (
@@ -28,8 +29,8 @@ function App() {
           element={<Main children={<EditProduct />} />}
         />
         <Route
-          path="/productlist"
-          element={<Main children={<ProductList />} />}
+          path="/itemlist"
+          element={<Main children={<ItemList />} />}
         />
         <Route
           path="/productpost"
