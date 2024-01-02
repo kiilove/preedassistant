@@ -9,6 +9,8 @@ import NewItem from "./pages/NewItem";
 import NewElectronicProduct from "./pages/NewElectronicProduct";
 import ElectronicList from "./pages/ElectronicList";
 import ItemList from "./pages/ItemList";
+import UserList from "./pages/UserList";
+import NewLocationHub from "./pages/NewLocationHub";
 
 function App() {
   return (
@@ -28,13 +30,15 @@ function App() {
           path="/editproduct"
           element={<Main children={<EditProduct />} />}
         />
-        <Route
-          path="/itemlist"
-          element={<Main children={<ItemList />} />}
-        />
+        <Route path="/itemlist" element={<Main children={<ItemList />} />} />
         <Route
           path="/productpost"
           element={<Main children={<PostByQuill />} />}
+        />
+        <Route path="/userlist" element={<Main children={<UserList />} />} />
+        <Route
+          path="/newlocationhub"
+          element={<Main children={<NewLocationHub />} />}
         />
         {/* <Route path="/test" element={<Main children={<AntdTest />} />} />
         <Route

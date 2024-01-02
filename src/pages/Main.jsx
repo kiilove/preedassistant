@@ -7,6 +7,7 @@ import {
   AppstoreAddOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
+import { ImLocation2 } from "react-icons/im";
 import { CiViewList } from "react-icons/ci";
 import {
   MdAddBusiness,
@@ -67,6 +68,22 @@ const Main = ({ children }) => {
               label: "가전제품목록",
               onClick: () => {
                 navigate("/electroniclist");
+              },
+            },
+            {
+              key: "5",
+              icon: <UserOutlined style={{ fontSize: "20px" }} />,
+              label: "유저목록",
+              onClick: () => {
+                navigate("/userlist");
+              },
+            },
+            {
+              key: "6",
+              icon: <ImLocation2 style={{ fontSize: "20px" }} />,
+              label: "지점등록",
+              onClick: () => {
+                navigate("/newlocationhub");
               },
             },
           ]}
