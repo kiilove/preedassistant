@@ -11,6 +11,7 @@ import ElectronicList from "./pages/ElectronicList";
 import ItemList from "./pages/ItemList";
 import UserList from "./pages/UserList";
 import NewLocationHub from "./pages/NewLocationHub";
+import UserRegister from "./pages/UserRegister";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           path="/newlocationhub"
           element={<Main children={<NewLocationHub />} />}
         />
+        <Route path="/userregister" element={<UserRegister />} />
         {/* <Route path="/test" element={<Main children={<AntdTest />} />} />
         <Route
           path="/customerlist"
