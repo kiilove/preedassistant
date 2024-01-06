@@ -11,7 +11,7 @@ import { getDatabase } from "firebase/database";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCZnanf5ghgN_eKFvh_7GTFQ6Sjp3o0QPw",
+  apiKey: process.env.REACT_APP_FIREBASE_KEY,
   authDomain: "preed-manager.firebaseapp.com",
   projectId: "preed-manager",
   storageBucket: "preed-manager.appspot.com",

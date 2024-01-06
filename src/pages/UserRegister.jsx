@@ -1,9 +1,16 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import UniqueIdApply from "../components/UniqueIdApply";
-import { Button, Form, Input, Radio, Space, Steps } from "antd";
+import { Button, Card, Form, Input, Radio, Space, Steps } from "antd";
 import { Timestamp } from "firebase/firestore";
 import PersonalInfoApply from "../components/PersonalInfoApply";
 import Password from "antd/es/input/Password";
+import {
+  encryptData,
+  formatPhoneNumber,
+  handlePhoneNumber,
+} from "../functions";
+import useFirebaseAuth from "../hooks/useFireAuth";
+import { useFirestoreAddData } from "../hooks/useFirestore";
 
 const UserRegister = () => {
   const [applyState, setApplyState] = useState({
@@ -12,14 +19,68 @@ const UserRegister = () => {
     personalValue: false,
     personalAt: undefined,
   });
+  const [registerInfo, setRegisterInfo] = useState({});
   const [currentStep, setCurrentStep] = useState(1);
-  const registerRef = useRef();
+  const loginRef = useRef();
+  const personalRef = useRef();
+  const extraRef = useRef();
+  const emailSignUp = useFirebaseAuth();
+  const userAdd = useFirestoreAddData();
   const handleApplys = (value) => {
     setApplyState(() => ({ ...applyState, ...value }));
   };
 
+  const handleUserInfo = async (data, collectionName) => {
+    try {
+      await userAdd.addData(collectionName, data, (value) =>
+        console.log(value)
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const registerFinished = (value) => {
     console.log(value);
+  };
+
+  const handleResult = async () => {
+    const applys = registerInfo.applys;
+    const logins = registerInfo.logins;
+    const personals = registerInfo.personals;
+    const createdAt = Timestamp.now();
+
+    const newResult = {
+      ...applys,
+      ...logins,
+      userPassword: encryptData(
+        logins.userPassword.trim(),
+        process.env.REACT_APP_SECRET_KEY
+      ),
+      ...personals,
+      createdAt,
+    };
+    delete newResult.userPasswordVerify;
+
+    console.log(logins);
+    try {
+      await emailSignUp.signUpWithEmail(
+        logins.userEmail,
+        logins.userPassword,
+        (value) =>
+          handleUserInfo(
+            {
+              ...newResult,
+              userAuthUid: value.user.uid,
+              userGrade: "normal",
+              userPic: "",
+            },
+            "users"
+          )
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const backgroudUrl =
@@ -75,66 +136,154 @@ const UserRegister = () => {
           </div>
         </div>
       </div>
+      <div className="flex w-full justify-center items-center">
+        <Button
+          onClick={() => {
+            setRegisterInfo(() => ({ ...registerInfo, applys: applyState }));
+            setCurrentStep(2);
+          }}
+        >
+          다음
+        </Button>
+      </div>
     </div>
   );
 
   const step2Component = (
-    <div className="flex flex-col w-full bg-white">
-      <div className="flex w-full justify-center h-20">
-        <span
-          className="text-gray-600"
-          style={{ fontSize: "24px", fontWeight: "bold" }}
+    <div className="flex justify-center items-center w-full flex-col">
+      <Card
+        title={
+          <span
+            className="text-gray-600"
+            style={{ fontSize: "20px", fontWeight: "bold" }}
+          >
+            로그인정보
+          </span>
+        }
+      >
+        <div className="flex w-full justify-center">
+          <Form
+            ref={loginRef}
+            onFinish={registerFinished}
+            labelCol={{
+              span: 5,
+            }}
+            wrapperCol={{
+              span: 10,
+            }}
+            size="large"
+            style={{ width: "540px" }}
+          >
+            <Form.Item name="userEmail" label="이메일" labelAlign="left">
+              <Space.Compact>
+                <Input style={{ width: "280px" }} />
+                <Button>중복체크</Button>
+              </Space.Compact>
+            </Form.Item>
+            <Form.Item name="userPassword" label="비밀번호" labelAlign="left">
+              <Password style={{ width: "280px" }} />
+            </Form.Item>
+            <Form.Item
+              name="userPasswordVerify"
+              label="비밀번호확인"
+              labelAlign="left"
+            >
+              <Password style={{ width: "280px" }} />
+            </Form.Item>
+          </Form>
+        </div>
+      </Card>
+      <div className="flex w-full justify-center items-center">
+        <Button
+          onClick={() => {
+            setRegisterInfo(() => ({
+              ...registerInfo,
+              logins: loginRef?.current.getFieldsValue(),
+            }));
+            setCurrentStep(3);
+          }}
         >
-          기본정보
-        </span>
+          다음
+        </Button>
       </div>
-      <div className="flex w-full justify-center">
-        <Form
-          ref={registerRef}
-          onFinish={registerFinished}
-          style={{ width: "80%" }}
+    </div>
+  );
+
+  const step3Component = (
+    <div className="flex justify-center items-center w-full flex-col">
+      <Card
+        title={
+          <span
+            className="text-gray-600"
+            style={{ fontSize: "20px", fontWeight: "bold" }}
+          >
+            개인정보
+          </span>
+        }
+      >
+        <div className="flex w-full justify-center">
+          <Form
+            ref={personalRef}
+            labelCol={{
+              span: 5,
+            }}
+            wrapperCol={{
+              span: 10,
+            }}
+            size="large"
+            style={{ width: "540px" }}
+          >
+            <Form.Item name="userName" label="이름(실명)" labelAlign="left">
+              <Input style={{ width: "280px" }} />
+            </Form.Item>
+            <Form.Item name="userPhoneNumber" label="연락처" labelAlign="left">
+              <Input
+                style={{ width: "280px" }}
+                onChange={(e) =>
+                  handlePhoneNumber(
+                    personalRef,
+                    "userPhoneNumber",
+                    e.target.value
+                  )
+                }
+              />
+            </Form.Item>
+            <Form.Item name="userGender" label="성별" labelAlign="left">
+              <Radio.Group
+                name="userGender"
+                defaultValue={false}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                }}
+              >
+                <Radio value="여자">여자</Radio>
+                <Radio value="남자">남자</Radio>
+              </Radio.Group>
+            </Form.Item>
+          </Form>
+        </div>
+      </Card>
+      <div className="flex w-full justify-center items-center">
+        <Button
+          onClick={() => {
+            setRegisterInfo(() => ({
+              ...registerInfo,
+              personals: personalRef?.current.getFieldsValue(),
+            }));
+            setCurrentStep(4);
+          }}
         >
-          <Form.Item name="userEmail">
-            <div
-              className="flex bg-gray-100 w-full items-center rounded-lg"
-              style={{ maxWidth: "800px", height: "55px" }}
-            >
-              <div className="flex w-1/4 px-5 justify-end h-full items-center">
-                <span className="font-semibold">이메일</span>
-              </div>
-              <div className="flex w-2/4 px-5 justify-start h-full items-center">
-                <Input style={{ height: "70%", width: "350px" }} />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item name="userPassword">
-            <div
-              className="flex bg-gray-100 w-full items-center rounded-lg"
-              style={{ maxWidth: "800px", height: "55px" }}
-            >
-              <div className="flex w-1/4 px-5 justify-end h-full items-center">
-                <span className="font-semibold">비밀번호</span>
-              </div>
-              <div className="flex w-2/4 px-5 justify-start h-full items-center">
-                <Password style={{ height: "70%", width: "350px" }} />
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item name="userPasswordVerify">
-            <div
-              className="flex bg-gray-100 w-full items-center rounded-lg"
-              style={{ maxWidth: "800px", height: "55px" }}
-            >
-              <div className="flex w-1/4 px-5 justify-end h-full items-center">
-                <span className="font-semibold">비밀번호</span>
-              </div>
-              <div className="flex w-2/4 px-5 justify-start h-full items-center">
-                <Password style={{ height: "70%", width: "350px" }} />
-              </div>
-            </div>
-          </Form.Item>
-          <Button htmlType="submit">회원가입</Button>
-        </Form>
+          다음
+        </Button>
+      </div>
+    </div>
+  );
+
+  const step4Component = (
+    <div className="w-full flex h-full flex-col">
+      <div className="w-full h-full justify-center items-center">가입완료</div>
+      <div className="flex w-full justify-center items-center">
+        <Button onClick={() => handleResult()}>마침</Button>
       </div>
     </div>
   );
@@ -144,13 +293,22 @@ const UserRegister = () => {
       component: step1Component,
     },
     {
-      title: "개인정보입력",
+      title: "로그인정보",
       component: step2Component,
     },
     {
+      title: "개인정보",
+      component: step3Component,
+    },
+    {
       title: "가입완료",
+      component: step4Component,
     },
   ];
+
+  useEffect(() => {
+    console.log(userAdd.error);
+  }, [userAdd.error]);
 
   return (
     <div
@@ -162,17 +320,10 @@ const UserRegister = () => {
         style={{ maxWidth: "1000px", maxHeight: "1000px" }}
       >
         <div className="flex w-full py-5 px-10">
-          <Steps items={stepItems} />
+          <Steps items={stepItems} current={currentStep - 1} />
         </div>
         <div className="flex w-full p-5">
           {stepItems[currentStep - 1]?.component}
-        </div>
-        <div className="flex px-5 justify-center items-center">
-          {currentStep === 1 && (
-            <Button size="large" onClick={() => setCurrentStep(2)}>
-              다음
-            </Button>
-          )}
         </div>
       </div>
     </div>

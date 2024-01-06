@@ -1,5 +1,15 @@
 import dayjs from "dayjs";
 import { v4 as uuidv4 } from "uuid";
+import CryptoJS from "crypto-js";
+
+export const encryptData = (data, secretKey) => {
+  return CryptoJS.AES.encrypt(data, secretKey).toString();
+};
+
+export const decryptData = (ciphertext, secretKey) => {
+  const bytes = CryptoJS.AES.decrypt(ciphertext, secretKey);
+  return bytes.toString(CryptoJS.enc.Utf8);
+};
 
 export const groupByKey = (list, key) => {
   return list.reduce((acc, item) => {
@@ -109,3 +119,10 @@ export function formatPhoneNumber(phoneNumber) {
     }
   }
 }
+
+export const handlePhoneNumber = (ref, fieldName, value) => {
+  ref?.current.setFieldsValue({
+    ...ref?.current.getFieldsValue(),
+    [fieldName]: formatPhoneNumber(value),
+  });
+};
