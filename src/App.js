@@ -28,7 +28,7 @@ function App() {
   const ProtectedRoute = ({ children }) => {
     const { loginStatus } = useContext(LoginContext);
     const navigate = useNavigate();
-    console.log(loginStatus);
+
     useEffect(() => {
       const timer = setTimeout(() => {
         if (!loginStatus?.userAuthUid) {
