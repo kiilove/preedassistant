@@ -15,22 +15,56 @@ import {
   MdOutlineFormatListBulleted,
   MdListAlt,
 } from "react-icons/md";
+import { IoMdSettings, IoIosLogOut } from "react-icons/io";
 import Sider from "antd/es/layout/Sider";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Content, Header } from "antd/es/layout/layout";
 
+import { LoginContext } from "../context/LoginContext";
+import useFirebaseAuth from "../hooks/useFireAuth";
+
 const Main = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const { logOut } = useFirebaseAuth();
+  const { currentUserInfo } = useContext(LoginContext);
+
   const navigate = useNavigate();
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const handleLogout = async () => {
+    try {
+      await logOut().then(() => {
+        localStorage.removeItem("locationTimeStamp");
+        navigate("/userlogin");
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
+        <Button
+          type="text"
+          icon={
+            collapsed ? (
+              <MenuUnfoldOutlined className="text-white" />
+            ) : (
+              <MenuFoldOutlined className="text-white" />
+            )
+          }
+          onClick={() => setCollapsed(!collapsed)}
+          style={{
+            fontSize: "16px",
+            width: 64,
+            height: 64,
+          }}
+        />
         <Menu
           theme="dark"
           mode="inline"
@@ -91,16 +125,22 @@ const Main = ({ children }) => {
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: colorBgContainer }}>
-          <Button
-            type="text"
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: "16px",
-              width: 64,
-              height: 64,
-            }}
-          />
+          <div className="flex w-full justify-end px-5 items-center gap-x-2">
+            <div className="flex">{currentUserInfo?.userName}님</div>
+            <button className="flex">
+              <IoMdSettings
+                className="text-gray-500"
+                style={{ fontSize: "25px" }}
+              />
+            </button>
+            <button className="flex" onClick={() => handleLogout()}>
+              <IoIosLogOut
+                className="text-gray-500"
+                style={{ fontSize: "25px" }}
+              />
+            </button>
+            {/* <Button onClick={() => logOut()}>로그아웃</Button> */}
+          </div>
         </Header>
         <Content
           style={{
