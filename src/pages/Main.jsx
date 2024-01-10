@@ -49,6 +49,14 @@ const Main = ({ children }) => {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed}>
+        <div className="flex w-full h-20 justify-center items-center">
+          <span
+            className="text-white font-semibold font-serif"
+            style={{ fontSize: "40px" }}
+          >
+            PAS
+          </span>
+        </div>
         <Button
           type="text"
           icon={
