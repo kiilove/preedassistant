@@ -31,6 +31,8 @@ const UserList = () => {
           userPic,
           userGender,
           userGrade,
+          userLevel,
+          userAccessToken,
         } = user;
 
         const dataField = {
@@ -41,6 +43,8 @@ const UserList = () => {
           userPic,
           userGender,
           userGrade,
+          userLevel,
+          userAccessToken,
         };
         console.log(dataField);
         return dataField;
@@ -68,6 +72,8 @@ const UserList = () => {
     { key: "userEmail", title: "이메일", dataIndex: "userEmail" },
     { key: "userPhoneNumber", title: "연락처", dataIndex: "userPhoneNumber" },
     { key: "userGrade", title: "등급", dataIndex: "userGrade" },
+    { key: "userLevel", title: "권한", dataIndex: "userLevel" },
+    { key: "userAccessToken", title: "토큰", dataIndex: "userAccessToken" },
   ];
   return (
     <>

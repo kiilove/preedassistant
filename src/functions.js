@@ -11,6 +11,15 @@ export const decryptData = (ciphertext, secretKey) => {
   return bytes.toString(CryptoJS.enc.Utf8);
 };
 
+export const generateToken = () => {
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let token = "";
+  for (let i = 0; i < 8; i++) {
+    token += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return token;
+};
 export const groupByKey = (list, key) => {
   return list.reduce((acc, item) => {
     if (!acc.some((accItem) => accItem.value === item[key])) {

@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import UniqueIdApply from "../components/UniqueIdApply";
 import { Button, Card, Form, Input, Radio, Space, Steps } from "antd";
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, where } from "firebase/firestore";
 import PersonalInfoApply from "../components/PersonalInfoApply";
 import Password from "antd/es/input/Password";
 import {
   encryptData,
   formatPhoneNumber,
+  generateToken,
   handlePhoneNumber,
 } from "../functions";
 import useFirebaseAuth from "../hooks/useFireAuth";
-import { useFirestoreAddData } from "../hooks/useFirestore";
+import { useFirestoreAddData, useFirestoreQuery } from "../hooks/useFirestore";
 
 const UserRegister = () => {
   const [applyState, setApplyState] = useState({
@@ -20,17 +21,44 @@ const UserRegister = () => {
     personalAt: undefined,
   });
   const [registerInfo, setRegisterInfo] = useState({});
+  const [accessToken, setAccessToken] = useState(undefined);
   const [currentStep, setCurrentStep] = useState(1);
   const loginRef = useRef();
   const personalRef = useRef();
   const extraRef = useRef();
   const emailSignUp = useFirebaseAuth();
   const userAdd = useFirestoreAddData();
+  const userQuery = useFirestoreQuery();
+
+  const handleUniqueAccessToken = async (token) => {
+    const tokenCondition = [where("userAccessToken", "==", token)];
+    try {
+      const data = await userQuery.getDocuments("users", null, tokenCondition);
+      //console.log(data);
+      return data?.length === 0 || data === undefined;
+    } catch (error) {
+      console.log(error);
+      return false; // 에러 발생 시, false를 반환
+    }
+  };
+
+  const findUniqueToken = async () => {
+    let token = generateToken();
+    let isUnique = await handleUniqueAccessToken(token);
+    console.log(isUnique);
+    while (!isUnique) {
+      token = generateToken();
+      isUnique = await handleUniqueAccessToken(token);
+    }
+    console.log(token);
+    return token;
+  };
   const handleApplys = (value) => {
     setApplyState(() => ({ ...applyState, ...value }));
   };
 
   const handleUserInfo = async (data, collectionName) => {
+    console.log(data);
     try {
       await userAdd.addData(collectionName, data, (value) =>
         console.log(value)
@@ -67,16 +95,21 @@ const UserRegister = () => {
       await emailSignUp.signUpWithEmail(
         logins.userEmail,
         logins.userPassword,
-        (value) =>
+        (value) => {
+          const token = findUniqueToken();
+          //console.log(token);
           handleUserInfo(
             {
               ...newResult,
               userAuthUid: value.user.uid,
               userGrade: "normal",
+              userLevel: "user",
               userPic: "",
+              userAccessToken: accessToken,
             },
             "users"
-          )
+          );
+        }
       );
     } catch (error) {
       console.log(error);
@@ -233,6 +266,9 @@ const UserRegister = () => {
             size="large"
             style={{ width: "540px" }}
           >
+            <Form.Item name="userAccessToken" label="토큰" labelAlign="left">
+              <Input style={{ width: "280px" }} disabled />
+            </Form.Item>
             <Form.Item name="userName" label="이름(실명)" labelAlign="left">
               <Input style={{ width: "280px" }} />
             </Form.Item>
@@ -309,6 +345,18 @@ const UserRegister = () => {
   useEffect(() => {
     console.log(userAdd.error);
   }, [userAdd.error]);
+
+  useEffect(() => {
+    console.log(accessToken);
+  }, [accessToken, personalRef?.current]);
+
+  useEffect(() => {
+    if (accessToken === undefined) {
+      findUniqueToken().then((data) => {
+        setAccessToken(data);
+      });
+    }
+  }, []);
 
   return (
     <div
