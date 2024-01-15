@@ -137,6 +137,8 @@ const NewElectronicProduct = () => {
     ref?.current.setFieldsValue({
       productUid: generateUUID(),
     });
+    setThumbnailFile([]);
+    setDescriptionFile([]);
   };
 
   const handleFinished = (value) => {
@@ -150,8 +152,8 @@ const NewElectronicProduct = () => {
 
   const handleAddProduct = async (value) => {
     try {
-      await productAdd.addData("electronics", value, (data) =>
-        console.log(data)
+      await productAdd.addData("electronics", value, () =>
+        handleInitProductForm(productRef)
       );
     } catch (error) {
       console.log(error);

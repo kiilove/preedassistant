@@ -12,16 +12,17 @@ const ElectronicCard = ({ data }) => {
     }
   };
   return (
-    <Tooltip>
+    <Tooltip title={data.productName}>
       <Card
         title={data.productName}
         size="small"
+        style={{ width: "300px" }}
         actions={[
           <EditOutlined
-            style={{ fontSize: "20px" }}
+            style={{ fontSize: "18px" }}
             onClick={() => redirectItemUpdate(data)}
           />,
-          <DeleteOutlined style={{ fontSize: "20px" }} />,
+          <DeleteOutlined style={{ fontSize: "18px" }} />,
         ]}
       >
         <div className="flex w-full flex-col gap-y-2">
@@ -32,7 +33,12 @@ const ElectronicCard = ({ data }) => {
             {data?.productThumbnail?.length > 0 ? (
               <img
                 src={data.productThumbnail[0].url}
-                style={{ maxWidth: "100px", width: "100%" }}
+                style={{
+                  maxWidth: "150px",
+                  width: "auto",
+                  maxHeight: "120px",
+                  height: "auto",
+                }}
               />
             ) : null}
           </div>

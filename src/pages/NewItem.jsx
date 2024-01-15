@@ -27,10 +27,35 @@ const NewItem = () => {
       itemUid: generateUUID(),
       itemIsActive: true,
       itemIsUnion: false,
+      itemIndex: 0,
     });
     setItemUnion(false);
 
     setProductList([]);
+  };
+
+  const handleItemTitle = (data) => {
+    let itemTitle = "";
+    if (data?.length === 0) {
+      return;
+    }
+
+    if (data?.length === 1) {
+      itemTitle = data[0].productName;
+    }
+
+    if (data?.length > 1) {
+      data.map((item, idx) => {
+        const { productName } = item;
+        if (data?.length === idx + 1) {
+          itemTitle = itemTitle + productName;
+        } else {
+          itemTitle = itemTitle + productName + "+";
+        }
+      });
+    }
+
+    return itemTitle;
   };
 
   const handleItemUnion = (value) => {
@@ -68,6 +93,10 @@ const NewItem = () => {
     initItemForm(itemRef);
   }, []);
 
+  useEffect(() => {
+    console.log(handleItemTitle(productList));
+  }, [productList]);
+
   return (
     <div className="flex w-full h-full bg-white rounded-lg p-5">
       <Card title="상품등록" style={{ minWidth: "600px" }}>
@@ -83,6 +112,29 @@ const NewItem = () => {
         >
           <Form.Item name="itemUid" label="관리번호">
             <Input disabled />
+          </Form.Item>
+          <Form.Item name="itemIsActive" label="판매여부">
+            <Switch defaultChecked />
+          </Form.Item>
+          <Form.Item name="itemIsUnion" label="결합상품">
+            <Switch onChange={handleItemUnion} />
+          </Form.Item>
+          <div className={itemUnion ? "flex pb-5" : "hidden"}>
+            {ProductFinder(productList, setProductList)}
+          </div>
+          <Form.Item
+            name="itemName"
+            label="상품명"
+            rules={[{ required: true, message: "상품명은 반드시 필요합니다." }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="accountCount"
+            label="필요구좌"
+            rules={[{ required: true, message: "구좌수를 선택하세요" }]}
+          >
+            <Select allowClear options={[...accountCounts]} />
           </Form.Item>
           <Form.Item
             name="itemVendor"
@@ -102,29 +154,7 @@ const NewItem = () => {
           >
             <Select allowClear options={[...filteredSangjo]} />
           </Form.Item>
-          <Form.Item name="itemIsActive" label="판매여부">
-            <Switch defaultChecked />
-          </Form.Item>
-          <Form.Item
-            name="itemName"
-            label="상품명"
-            rules={[{ required: true, message: "상품명은 반드시 필요합니다." }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="accountCount"
-            label="필요구좌"
-            rules={[{ required: true, message: "구좌수를 선택하세요" }]}
-          >
-            <Select allowClear options={[...accountCounts]} />
-          </Form.Item>
-          <Form.Item name="itemIsUnion" label="결합상품">
-            <Switch onChange={handleItemUnion} />
-          </Form.Item>
-          <div className={itemUnion ? "flex pb-5" : "hidden"}>
-            {ProductFinder(productList, setProductList)}
-          </div>
+
           <div className="flex gap-x-2">
             <Button htmlType="submit">상품등록</Button>
             <Button onClick={() => initItemForm(itemRef)}>초기화</Button>

@@ -202,9 +202,10 @@ const ItemList = () => {
           </div>
           <div className="flex w-full h-auto bg-white rounded-lg p-2 gap-2">
             {filteredData?.length > 0 &&
-              filteredData.map((filter, fIdx) => (
-                <ItemCard key={fIdx} data={filter} />
-              ))}
+              filteredData.map((filter, fIdx) => {
+                console.log(filter);
+                return <ItemCard key={fIdx} data={filter} />;
+              })}
           </div>
         </div>
       )}

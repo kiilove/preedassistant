@@ -26,11 +26,13 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
   };
 
   const handleFilters = (keys, values, list) => {
+    console.log(list);
     const filtered = list.filter((f) => {
       return keys.every((key, index) => {
         return f[key] === values[index];
       });
     });
+
     if (filtered?.length > 0) {
       const filteredProductName = filtered.map((filter, fIdx) => {
         const { id, productName } = filter;
@@ -53,6 +55,7 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
       newList.push({ ...value });
 
       setPrevList([...newList]);
+      setFilteredProductList([...productList]);
       setFilterProductType(undefined);
       setFilterProductVendor(undefined);
       setFilterProductName([]);
@@ -69,6 +72,7 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
   }, [productList]);
 
   useEffect(() => {
+    console.log(filterProductType, filterProductVendor);
     if (filterProductType === undefined || filterProductVendor === undefined) {
       return;
     }
@@ -78,7 +82,7 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
       [filterProductType, filterProductVendor],
       filteredProductList
     );
-  }, [filterProductVendor]);
+  }, [filterProductVendor, filterProductType]);
 
   useEffect(() => {
     if (firestoreFetchs.error !== null) {

@@ -13,7 +13,9 @@ const ItemCard = ({ data }) => {
   if (!data) {
     return;
   }
-
+  if (data.productList?.length === 0) {
+    return;
+  }
   if (data.productList?.length === 1) {
     thumbnail = (
       <div className="flex w-full h-32 justify-center items-center">
@@ -36,12 +38,14 @@ const ItemCard = ({ data }) => {
         />
       </div>
     );
-  } else {
+  } else if (data.productList?.length > 1) {
     thumbnail = (
       <div className="flex w-auto h-28 justify-center items-center">
         {data?.productList?.map((product, pIdx) => {
-          const { productPic } = product;
-          const url = productPic[0].url;
+          const { productThumbnail } = product;
+          console.log(productThumbnail);
+          const url = productThumbnail[0].url;
+          console.log(url);
 
           return (
             <div key={pIdx} className="flex">
@@ -65,24 +69,19 @@ const ItemCard = ({ data }) => {
       </div>
     );
     spec = (
-      <div className="flex w-full h-28 justify-center items-center">
+      <div className="flex justify-start items-start flex-col h-full w-full">
         {data?.productList?.map((product, pIdx) => {
-          const { productInfomation, productType, productUid } = product;
-          const quillValue = JSON.parse(productInfomation);
-
+          const { productType, productSpec } = product;
           return (
-            <div
-              key={pIdx}
-              className="flex justify-start items-start flex-col h-full w-full gap-2 "
-            >
-              <span className="px-4 ">[{productType}]</span>
-              <ReactQuill
+            <>
+              <span className="px-4">[{productType}]</span>
+              <TextArea
+                value={productSpec}
                 readOnly
-                theme="bubble"
-                value={quillValue}
-                style={{ minHeight: "180px", maxHeight: "200px" }}
+                rows={5}
+                style={{ resize: "none" }}
               />
-            </div>
+            </>
           );
         })}
       </div>
@@ -120,7 +119,10 @@ const ItemCard = ({ data }) => {
           <div className="flex w-full bg-gray-300 h-8 justify-center items-center font-bold text-base border-y border-gray-500">
             {data.itemName}
           </div>
-          <div className="flex w-full" style={{ height: "140px" }}>
+          <div
+            className="flex w-full"
+            style={{ minheight: "140px", height: "100%" }}
+          >
             {spec}
           </div>
         </div>
