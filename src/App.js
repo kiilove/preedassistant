@@ -22,6 +22,7 @@ import UserLogin from "./pages/UserLogin";
 import NormalUserDashboard from "./pages/NormalUserDashboard";
 import useFirebaseAuth from "./hooks/useFireAuth";
 import { LoginContext, LoginProvider } from "./context/LoginContext";
+import EditElectronicProduct from "./pages/EditElectronicProduct";
 
 function App() {
   // 보호된 라우트 컴포넌트
@@ -34,7 +35,7 @@ function App() {
         if (!loginStatus?.userAuthUid) {
           navigate("/userlogin");
         }
-      }, 1000); // 1초 후 로그인 상태 확인
+      }, 2000); // 1초 후 로그인 상태 확인
 
       return () => clearTimeout(timer); // 컴포넌트 언마운트 시 타이머 정리
     }, [loginStatus]);
@@ -82,7 +83,7 @@ function App() {
             path="/editproduct"
             element={
               <ProtectedRoute>
-                <Main children={<EditProduct />} />
+                <Main children={<EditElectronicProduct />} />
               </ProtectedRoute>
             }
           />

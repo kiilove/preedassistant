@@ -77,6 +77,7 @@ const NewItem = () => {
     let newValue = { ...value };
 
     if (productList?.length > 0) {
+      newValue = { ...newValue, productList };
     }
 
     try {
