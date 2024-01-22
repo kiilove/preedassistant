@@ -9,6 +9,7 @@ import {
   Space,
   Switch,
   Upload,
+  notification,
   theme,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -40,6 +41,15 @@ const NewElectronicProduct = () => {
   const uploadThumbnail = useImageUpload("/productPic/");
   const uploadDescription = useImageUpload("/productDescrition/");
   const productAdd = useFirestoreAddData();
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (apiType, title, message, placement, duration) => {
+    api[apiType]({
+      message: title,
+      description: message,
+      placement,
+      duration,
+    });
+  };
 
   const getBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -152,9 +162,16 @@ const NewElectronicProduct = () => {
 
   const handleAddProduct = async (value) => {
     try {
-      await productAdd.addData("electronics", value, () =>
-        handleInitProductForm(productRef)
-      );
+      await productAdd.addData("electronics", value, () => {
+        handleInitProductForm(productRef);
+        openNotification(
+          "success",
+          "데이터추가",
+          "제품이 등록되었습니다.",
+          "bottomLeft",
+          3
+        );
+      });
     } catch (error) {
       console.log(error);
     }
@@ -239,6 +256,7 @@ const NewElectronicProduct = () => {
           </div>
         </Form>
       </Card>
+      {contextHolder}
     </div>
   );
 };

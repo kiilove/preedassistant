@@ -77,11 +77,10 @@ const NewItem = () => {
     let newValue = { ...value };
 
     if (productList?.length > 0) {
-      newValue = { ...newValue, productList };
     }
 
     try {
-      await itemAdd.addData("sangjos", { ...newValue }, (data) => {
+      await itemAdd.addData("sangjos", { ...newValue }, () => {
         initItemForm(itemRef);
       });
     } catch (error) {
@@ -94,7 +93,10 @@ const NewItem = () => {
   }, []);
 
   useEffect(() => {
-    console.log(handleItemTitle(productList));
+    itemRef?.current.setFieldsValue({
+      ...itemRef?.current.getFieldsValue(),
+      itemName: handleItemTitle(productList),
+    });
   }, [productList]);
 
   return (
