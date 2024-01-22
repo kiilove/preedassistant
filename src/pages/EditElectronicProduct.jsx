@@ -19,9 +19,11 @@ import TextArea from "antd/es/input/TextArea";
 import useImageUpload from "../hooks copy/useFireStorage";
 import {
   useFirestoreAddData,
+  useFirestoreQuery,
   useFirestoreUpdateData,
 } from "../hooks/useFirestore";
 import { useLocation } from "react-router-dom";
+import { where } from "firebase/firestore";
 
 const EditElectronicProduct = () => {
   const [thumbnailFileList, setThumbnailFile] = useState([]);
@@ -40,6 +42,7 @@ const EditElectronicProduct = () => {
   const uploadDescription = useImageUpload("/productDescrition/");
   const productAdd = useFirestoreAddData();
   const productUpdate = useFirestoreUpdateData();
+  const itemQuery = useFirestoreQuery();
   const location = useLocation();
   const [api, contextHolder] = notification.useNotification();
   const openNotification = (apiType, title, message, placement, duration) => {
@@ -188,16 +191,6 @@ const EditElectronicProduct = () => {
     }
   };
 
-  const handleAddProduct = async (value) => {
-    try {
-      await productAdd.addData("electronics", value, () =>
-        handleInitProductForm(productRef)
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const handleUpdateProduct = async (id, value) => {
     try {
       await productUpdate.updateData("electronics", id, { ...value }, () => {
@@ -214,6 +207,21 @@ const EditElectronicProduct = () => {
     }
   };
 
+  const filterItemsIncludeProduct = async (id) => {
+    const conditionById = [where("id", "array-contains-any", [id])];
+    try {
+      itemQuery.getDocuments(
+        "sangjos",
+        (data) => {
+          console.log(data);
+        },
+        conditionById
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     handleInitProductForm(productRef);
   }, []);
@@ -221,6 +229,7 @@ const EditElectronicProduct = () => {
   useEffect(() => {
     if (location?.state?.data) {
       handleInitProductForm(productRef, location.state.data);
+      filterItemsIncludeProduct(location.state.data.id);
     }
   }, [location]);
 
