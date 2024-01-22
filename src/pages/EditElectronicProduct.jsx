@@ -208,15 +208,19 @@ const EditElectronicProduct = () => {
   };
 
   const filterItemsIncludeProduct = async (id) => {
-    const conditionById = [where("id", "array-contains-any", [id])];
+    let filteredItems = [];
     try {
-      itemQuery.getDocuments(
-        "sangjos",
-        (data) => {
-          console.log(data);
-        },
-        conditionById
-      );
+      itemQuery.getDocuments("sangjos", (data) => {
+        console.log(
+          data.filter((item) =>
+            item.productList.some((product) => product.id === id)
+          )
+        );
+
+        filteredItems = data.filter((item) =>
+          item.productList.some((product) => product.id === id)
+        );
+      });
     } catch (error) {
       console.log(error);
     }
