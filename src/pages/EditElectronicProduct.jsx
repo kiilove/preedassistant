@@ -159,13 +159,13 @@ const EditElectronicProduct = () => {
   };
 
   const handleInitProductForm = (ref, value) => {
-    const initFormvalue = { ...value };
-    delete initFormvalue.productThumbnail;
-    delete initFormvalue.productDescription;
-    delete initFormvalue.id;
+    const initFormValue = { ...value };
+    delete initFormValue.productThumbnail;
+    delete initFormValue.productDescription;
+    delete initFormValue.id;
 
-    if (initFormvalue?.productUid) {
-      ref?.current.setFieldsValue({ ...initFormvalue });
+    if (initFormValue?.productUid) {
+      ref?.current.setFieldsValue({ ...initFormValue });
       setThumbnailFile([...value.productThumbnail]);
       setDescriptionFile([...value.productDescription]);
     }
@@ -253,7 +253,7 @@ const EditElectronicProduct = () => {
           src={previewImage}
         />
       </Modal>
-      <Card title="가전제품등록" style={{ minWidth: "600px" }}>
+      <Card title="가전제품수정" style={{ minWidth: "600px" }}>
         <Form
           labelCol={{
             span: 6,

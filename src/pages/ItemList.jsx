@@ -1,6 +1,19 @@
-import { Button, Card, Divider, Form, Input, Space } from "antd";
+import {
+  Button,
+  Card,
+  Divider,
+  Empty,
+  Form,
+  Input,
+  Space,
+  notification,
+} from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useFirestoreQuery } from "../hooks/useFirestore";
+import {
+  useFirestoreDeleteData,
+  useFirestoreGetDocument,
+  useFirestoreQuery,
+} from "../hooks/useFirestore";
 import { where } from "firebase/firestore";
 import ProductCard from "../components/ProductCard";
 import ItemCard from "../components/ItemCard";
@@ -16,9 +29,20 @@ const ItemList = () => {
   });
 
   const firestoreGet = useFirestoreQuery();
+  const getElectronic = useFirestoreGetDocument();
+
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (apiType, title, message, placement, duration) => {
+    api[apiType]({
+      message: title,
+      description: message,
+      placement,
+      duration,
+    });
+  };
 
   const filteredData = useMemo(() => {
-    let filtered = [...products];
+    let filtered = [...filteredItems];
 
     if (searchQuery.isActive !== "all") {
       // 문자열을 boolean으로 변환
@@ -44,14 +68,14 @@ const ItemList = () => {
     searchQuery.isActive,
     searchQuery.accountCount,
     searchQuery.keyword,
-    products,
+    filteredItems,
   ]);
 
   const fetchedData = async () => {
     try {
       await firestoreGet.getDocuments("sangjos", (data) => {
-        setProducts([...data]);
-        setFilteredItems([...data]);
+        //setProducts([...data]);
+        //setFilteredItems([...data]);
         setIsLoading(false);
       });
       // console.log(fetched);
@@ -62,6 +86,50 @@ const ItemList = () => {
       console.log(error);
     }
   };
+
+  const fetchedElectronic = async (id) => {
+    let fetched = {};
+    try {
+      await getElectronic.getDocument("electronics", id, (data) => {
+        if (data) {
+          fetched = data;
+        } else {
+          openNotification(
+            "error",
+            "에러경고",
+            "가전제품을 불러오는데 실패했습니다.",
+            "bottomLeft",
+            3
+          );
+          return;
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+
+    return fetched;
+  };
+  useEffect(() => {
+    const products = [...firestoreGet.data];
+    if (products?.length > 0) {
+      const itemAndElectronicJoin = products.map((product, pIdx) => {
+        const { productIdList } = product;
+        const productInfo = [];
+        if (productIdList.length > 0) {
+          productIdList.map(async (id, iIdx) => {
+            const data = await fetchedElectronic(id);
+            console.log(data);
+            productInfo.push({ ...data });
+          });
+        }
+        const joinedData = { ...product, productInfo };
+        return joinedData;
+      });
+      console.log(itemAndElectronicJoin);
+      setFilteredItems([...itemAndElectronicJoin]);
+    }
+  }, [firestoreGet.data]);
 
   useEffect(() => {
     fetchedData();
@@ -201,11 +269,16 @@ const ItemList = () => {
             <div className="flex justify-start items-center"></div>
           </div>
           <div className="flex w-full h-auto bg-white rounded-lg p-2 gap-2">
-            {filteredData?.length > 0 &&
+            {filteredData?.length > 0 ? (
               filteredData.map((filter, fIdx) => {
                 console.log(filter);
                 return <ItemCard key={fIdx} data={filter} />;
-              })}
+              })
+            ) : (
+              <div className="flex w-full h-full justify-center items-center">
+                <Empty description="표시할 내용이 없습니다." />
+              </div>
+            )}
           </div>
         </div>
       )}

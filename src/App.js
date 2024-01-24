@@ -12,7 +12,7 @@ import Main from "./pages/Main";
 import NewItem from "./pages/NewItem";
 import NewElectronicProduct from "./pages/NewElectronicProduct";
 import ElectronicList from "./pages/ElectronicList";
-import EditProduct from "./pages/EditProduct";
+
 import ItemList from "./pages/ItemList";
 import PostByQuill from "./components/PostByQuill";
 import UserList from "./pages/UserList";
@@ -23,6 +23,7 @@ import NormalUserDashboard from "./pages/NormalUserDashboard";
 import useFirebaseAuth from "./hooks/useFireAuth";
 import { LoginContext, LoginProvider } from "./context/LoginContext";
 import EditElectronicProduct from "./pages/EditElectronicProduct";
+import EditItem from "./pages/EditItem";
 
 function App() {
   // 보호된 라우트 컴포넌트
@@ -64,6 +65,14 @@ function App() {
             }
           />
           <Route
+            path="/edititem"
+            element={
+              <ProtectedRoute>
+                <Main children={<EditItem />} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/newelectronicproduct"
             element={
               <ProtectedRoute>
@@ -80,7 +89,7 @@ function App() {
             }
           />
           <Route
-            path="/editproduct"
+            path="/editelectronic"
             element={
               <ProtectedRoute>
                 <Main children={<EditElectronicProduct />} />

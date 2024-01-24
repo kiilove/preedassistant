@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useFirestoreQuery } from "../hooks/useFirestore";
-import { Button, Form, Select } from "antd";
+
+import { Button, Card, Form, Popconfirm, Select, notification } from "antd";
 import { makerNames, productTypes } from "../consts";
 import ElectronicProductPreview from "./ElectronicProductPreview";
 
 const ProductFinder = (prevList, setPrevList, prevRefresh) => {
   const [productList, setProductList] = useState([]);
   const [currentProduct, setCurrentProduct] = useState({});
+
   const [currentProducts, setCurrentProducts] = useState([...prevList]);
   const [filteredProductList, setFilteredProductList] = useState([]);
   const [filterProductType, setFilterProductType] = useState(undefined);
@@ -15,6 +17,15 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
   const filterRef = useRef();
 
   const firestoreFetchs = useFirestoreQuery();
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification = (apiType, title, message, placement, duration) => {
+    api[apiType]({
+      message: title,
+      description: message,
+      placement,
+      duration,
+    });
+  };
   const fetchAllProducts = async () => {
     try {
       await firestoreFetchs.getDocuments("electronics", (data) => {
@@ -26,7 +37,7 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
   };
 
   const handleFilters = (keys, values, list) => {
-    console.log(list);
+ 
     const filtered = list.filter((f) => {
       return keys.every((key, index) => {
         return f[key] === values[index];
@@ -137,7 +148,7 @@ const ProductFinder = (prevList, setPrevList, prevRefresh) => {
         </Button>
       </div>
       <div className="flex w-full items-start gap-x-2">
-        <ElectronicProductPreview list={[...prevList]} />
+        <ElectronicProductPreview list={[...prevList]} setList={setPrevList} />
       </div>
     </div>
   );

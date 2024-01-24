@@ -101,9 +101,9 @@ const NewElectronicProduct = () => {
     setThumbnailFile(newFileList);
   };
   const handleDescriptionFileRemove = async (file) => {
-    await uploadThumbnail.deleteFileFromStorage(file.url);
+    await uploadDescription.deleteFileFromStorage(file.url);
 
-    const newFileList = thumbnailFileList.filter(
+    const newFileList = descriptionFileList.filter(
       (item) => item.uid !== file.uid
     );
     setThumbnailFile(newFileList);

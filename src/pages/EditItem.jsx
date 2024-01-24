@@ -1,22 +1,24 @@
 import { Button, Card, Form, Input, Select, Switch, notification } from "antd";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  accountCounts,
-  makerNames,
-  productTypes,
-  quillFormats,
-  quillModules,
-  sangjoList,
-  vendorList,
-} from "../consts";
+import { accountCounts, sangjoList, vendorList } from "../consts";
 import { generateUUID } from "../functions";
 import ProductFinder from "../components/ProductFinder";
-import { useFirestoreAddData } from "../hooks/useFirestore";
+import {
+  useFirestoreAddData,
+  useFirestoreGetDocument,
+  useFirestoreUpdateData,
+} from "../hooks/useFirestore";
+import { useLocation } from "react-router-dom";
+import { init } from "canvas-to-blob";
 
-const NewItem = () => {
+const EditItem = () => {
   const [itemUnion, setItemUnion] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [filteredSangjo, setFilteredSangjo] = useState([]);
   const [productList, setProductList] = useState([]);
+
+  const itemUpdate = useFirestoreUpdateData();
+  const location = useLocation();
   const [api, contextHolder] = notification.useNotification();
   const openNotification = (apiType, title, message, placement, duration) => {
     api[apiType]({
@@ -41,6 +43,18 @@ const NewItem = () => {
     setItemUnion(false);
 
     setProductList([]);
+  };
+
+  const handleInitItemForm = (ref, value) => {
+    const initFormValue = { ...value };
+    delete initFormValue.productIdList;
+    delete initFormValue.productInfo;
+
+    if (initFormValue?.itemUid) {
+      ref?.current.setFieldsValue({ ...initFormValue });
+      setProductList(() => [...value.productInfo]);
+      setItemUnion(initFormValue.itemIsUnion);
+    }
   };
 
   const handleItemTitle = (data) => {
@@ -82,7 +96,21 @@ const NewItem = () => {
     }
   };
 
-  const itemFinished = async (value) => {
+  const handleUpdateItem = async (propId, value) => {
+    try {
+      await itemUpdate.updateData("sangjos", propId, { ...value }, () => {
+        openNotification(
+          "success",
+          "상품수정알림",
+          "상품이 정상적으로 수정되었습니다.",
+          "bottomLeft",
+          3
+        );
+      });
+    } catch (error) {}
+  };
+
+  const itemFinished = (value) => {
     let newValue = { ...value };
 
     if (productList?.length > 0) {
@@ -91,26 +119,33 @@ const NewItem = () => {
       });
       newValue = { ...newValue, productIdList };
     }
+    handleUpdateItem(location.state.data.id, { ...newValue });
 
-    try {
-      await itemAdd.addData("sangjos", { ...newValue }, () => {
-        initItemForm(itemRef);
-        openNotification(
-          "success",
-          "상품등록알림",
-          "상품이 정상적으로 등록되었습니다.",
-          "bottomLeft",
-          3
-        );
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await itemAdd.addData("sangjos", { ...newValue }, () => {
+    //     initItemForm(itemRef);
+    //     openNotification(
+    //       "success",
+    //       "상품등록알림",
+    //       "상품이 정상적으로 수정되었습니다.",
+    //       "bottomLeft",
+    //       3
+    //     );
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   useEffect(() => {
     initItemForm(itemRef);
   }, []);
+
+  useEffect(() => {
+    if (location?.state?.data) {
+      handleInitItemForm(itemRef, location.state.data);
+    }
+  }, [location]);
 
   useEffect(() => {
     itemRef?.current.setFieldsValue({
@@ -178,7 +213,7 @@ const NewItem = () => {
           </Form.Item>
 
           <div className="flex gap-x-2">
-            <Button htmlType="submit">상품등록</Button>
+            <Button htmlType="submit">수정</Button>
             <Button onClick={() => initItemForm(itemRef)}>초기화</Button>
           </div>
         </Form>
@@ -188,4 +223,4 @@ const NewItem = () => {
   );
 };
 
-export default NewItem;
+export default EditItem;
