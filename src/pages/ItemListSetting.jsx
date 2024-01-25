@@ -1,14 +1,13 @@
-import { Button, Card, Empty, Input, Space, notification } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
+import { Button, Card, Empty, Input, Space, notification } from "antd";
 import {
   useFirestoreGetDocument,
   useFirestoreQuery,
 } from "../hooks/useFirestore";
-import { where } from "firebase/firestore";
-import ProductCard from "../components/ProductCard";
-import ItemCard from "../components/ItemCard";
 
-const ItemList = () => {
+import ItemTable from "../components/ItemTable";
+
+const ItemListSetting = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -17,7 +16,6 @@ const ItemList = () => {
     accountCount: "all",
     keyword: "",
   });
-
   const firestoreGet = useFirestoreQuery();
   const getElectronic = useFirestoreGetDocument();
 
@@ -64,14 +62,8 @@ const ItemList = () => {
   const fetchedData = async () => {
     try {
       await firestoreGet.getDocuments("sangjos", (data) => {
-        //setProducts([...data]);
-        //setFilteredItems([...data]);
         setIsLoading(false);
       });
-      // console.log(fetched);
-      // if (fetched.length > 0) {
-      //   setProducts(() => [...fetched]);
-      // }
     } catch (error) {
       console.log(error);
     }
@@ -109,14 +101,14 @@ const ItemList = () => {
         if (productIdList.length > 0) {
           productIdList.map(async (id, iIdx) => {
             const data = await fetchedElectronic(id);
-            console.log(data);
+
             productInfo.push({ ...data });
           });
         }
         const joinedData = { ...product, productInfo };
         return joinedData;
       });
-      console.log(itemAndElectronicJoin);
+
       setFilteredItems([...itemAndElectronicJoin]);
     }
   }, [firestoreGet.data]);
@@ -260,10 +252,7 @@ const ItemList = () => {
           </div>
           <div className="flex w-full h-auto bg-white rounded-lg p-2 gap-2">
             {filteredData?.length > 0 ? (
-              filteredData.map((filter, fIdx) => {
-                console.log(filter);
-                return <ItemCard key={fIdx} data={filter} />;
-              })
+              <ItemTable data={filteredData} />
             ) : (
               <div className="flex w-full h-full justify-center items-center">
                 <Empty description="표시할 내용이 없습니다." />
@@ -276,4 +265,4 @@ const ItemList = () => {
   );
 };
 
-export default ItemList;
+export default ItemListSetting;

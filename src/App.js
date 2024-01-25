@@ -24,6 +24,7 @@ import useFirebaseAuth from "./hooks/useFireAuth";
 import { LoginContext, LoginProvider } from "./context/LoginContext";
 import EditElectronicProduct from "./pages/EditElectronicProduct";
 import EditItem from "./pages/EditItem";
+import ItemListSetting from "./pages/ItemListSetting";
 
 function App() {
   // 보호된 라우트 컴포넌트
@@ -125,6 +126,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Main children={<NewLocationHub />} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/itemlistsetting"
+            element={
+              <ProtectedRoute>
+                <Main children={<ItemListSetting />} />
               </ProtectedRoute>
             }
           />

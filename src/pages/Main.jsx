@@ -128,6 +128,14 @@ const Main = ({ children }) => {
                 navigate("/newlocationhub");
               },
             },
+            {
+              key: "7",
+              icon: <MdListAlt style={{ fontSize: "20px" }} />,
+              label: "베스트상품설정",
+              onClick: () => {
+                navigate("/itemlistsetting");
+              },
+            },
           ]}
         ></Menu>
       </Sider>
