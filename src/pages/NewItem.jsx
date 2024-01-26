@@ -89,7 +89,7 @@ const NewItem = () => {
       const productIdList = productList.map((product, pIdx) => {
         return product.id;
       });
-      newValue = { ...newValue, productIdList };
+      newValue = { ...newValue, productIdList, isBest: false };
     }
 
     try {

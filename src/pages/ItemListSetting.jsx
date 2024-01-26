@@ -6,6 +6,7 @@ import {
 } from "../hooks/useFirestore";
 
 import ItemTable from "../components/ItemTable";
+import { TitleBasicType } from "../components/ComponentTitles";
 
 const ItemListSetting = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -127,6 +128,9 @@ const ItemListSetting = () => {
         <div className="flex w-full bg-white justify-start items-center p-5 rounded-lg"></div>
       ) : (
         <div className="flex w-full h-full  rounded-lg flex-col gap-y-2">
+          <div className="flex">
+            <TitleBasicType titleText={"베스트상품등록"} />
+          </div>
           <div className="flex w-full bg-white justify-start items-center p-5 rounded-lg">
             <Space>
               <Card title="판매여부" size="small">
