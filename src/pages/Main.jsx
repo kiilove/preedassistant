@@ -16,6 +16,7 @@ import {
   MdListAlt,
 } from "react-icons/md";
 import { IoMdSettings, IoIosLogOut } from "react-icons/io";
+import { AiOutlineLike } from "react-icons/ai";
 import Sider from "antd/es/layout/Sider";
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -130,7 +131,7 @@ const Main = ({ children }) => {
             },
             {
               key: "7",
-              icon: <MdListAlt style={{ fontSize: "20px" }} />,
+              icon: <AiOutlineLike style={{ fontSize: "20px" }} />,
               label: "베스트상품설정",
               onClick: () => {
                 navigate("/itemlistsetting");

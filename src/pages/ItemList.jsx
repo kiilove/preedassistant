@@ -258,7 +258,7 @@ const ItemList = () => {
             </Space>
             <div className="flex justify-start items-center"></div>
           </div>
-          <div className="flex w-full h-auto bg-white rounded-lg p-2 gap-2">
+          <div className="flex w-full h-auto bg-white rounded-lg p-2 gap-2 flex-wrap">
             {filteredData?.length > 0 ? (
               filteredData.map((filter, fIdx) => {
                 console.log(filter);
