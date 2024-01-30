@@ -164,7 +164,7 @@ const Main = ({ children }) => {
             margin: "24px 16px",
             minHeight: 280,
           }}
-          className=" rounded-lg"
+          className="rounded-lg"
         >
           {children}
         </Content>
