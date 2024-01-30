@@ -1,35 +1,22 @@
 import {
   Button,
   Card,
-  Empty,
   Form,
   Input,
   Modal,
   Select,
-  Space,
-  Switch,
   Upload,
   notification,
-  theme,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import React, { useRef, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
-import "react-quill/dist/quill.bubble.css";
-import DOMPurify from "dompurify";
+
 import { useEffect } from "react";
 import { generateFileName, generateUUID } from "../functions";
-import {
-  accountCounts,
-  makerNames,
-  productTypes,
-  quillFormats,
-  quillModules,
-} from "../consts";
+import { makerNames, productTypes } from "../consts";
 import TextArea from "antd/es/input/TextArea";
-import useImageUpload from "../hooks copy/useFireStorage";
 import { useFirestoreAddData } from "../hooks/useFirestore";
+import useImageUpload from "../hooks/useFireStorage";
 
 const NewElectronicProduct = () => {
   const [thumbnailFileList, setThumbnailFile] = useState([]);
@@ -129,7 +116,11 @@ const NewElectronicProduct = () => {
     const newFileName = generateFileName(file.name, generateUUID());
 
     try {
-      const result = await uploadDescription.uploadImage(file, newFileName);
+      const result = await uploadDescription.uploadImage(
+        file,
+        newFileName,
+        false
+      );
       handleDescriptionFileAdd({
         uid: result.filename,
         name: newFileName,

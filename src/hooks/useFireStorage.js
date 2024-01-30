@@ -67,11 +67,16 @@ const useImageUpload = (path) => {
   });
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const uploadImage = async (file, filename, maxSizeInBytes = 500 * 1024) => {
+  const uploadImage = async (
+    file,
+    filename,
+    isResize = true,
+    maxSizeInBytes = 500 * 1024
+  ) => {
     return new Promise(async (resolve, reject) => {
       let resizedFile = file;
 
-      if (resizedFile?.size > maxSizeInBytes) {
+      if (isResize && resizedFile?.size > maxSizeInBytes) {
         // 이미지 크기가 maxSizeInBytes를 초과하면 리사이즈
         resizedFile = await resizeImage(resizedFile, maxSizeInBytes);
       }

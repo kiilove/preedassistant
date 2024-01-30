@@ -16,7 +16,7 @@ import { useEffect } from "react";
 import { generateFileName, generateUUID } from "../functions";
 import { makerNames, productTypes } from "../consts";
 import TextArea from "antd/es/input/TextArea";
-import useImageUpload from "../hooks copy/useFireStorage";
+
 import {
   useFirestoreAddData,
   useFirestoreQuery,
@@ -24,6 +24,7 @@ import {
 } from "../hooks/useFirestore";
 import { useLocation } from "react-router-dom";
 import { where } from "firebase/firestore";
+import useImageUpload from "../hooks/useFireStorage";
 
 const EditElectronicProduct = () => {
   const [thumbnailFileList, setThumbnailFile] = useState([]);
@@ -145,7 +146,11 @@ const EditElectronicProduct = () => {
     const newFileName = generateFileName(file.name, generateUUID());
 
     try {
-      const result = await uploadDescription.uploadImage(file, newFileName);
+      const result = await uploadDescription.uploadImage(
+        file,
+        newFileName,
+        false
+      );
       handleDescriptionFileAdd({
         uid: result.filename,
         name: newFileName,
